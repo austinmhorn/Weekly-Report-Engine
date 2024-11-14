@@ -18,15 +18,22 @@ struct AvailabilityData
     std::string p_floorplan;
     std::string p_unit_type;
     std::string p_exclusion_name;
+    float p_best_price;
+    int p_sqft;
     int p_days_vacant;
     std::tm p_move_out;
     std::tm p_available_on;
     float p_budgeted_rent;
+    float p_market_rent;
+    float p_prior_lease_rent;
     std::tm p_scheduled_move_in;
     std::string p_unit_notes;
     std::string p_unit_activity_notes;
     std::string p_hazard_note;
     float p_est_vacancy_cost;
+    std::tm p_lease_completed;
+    float p_future_lease_rent = 0.0f;
+    std::string p_future_lease_rent_str = "~";
 };
 
 

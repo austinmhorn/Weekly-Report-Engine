@@ -163,7 +163,32 @@ bool unzipFile(const std::string& zipFilePath, const std::string& destDir) {
     return true;
 }
 
+std::string transformDatePeriodStr(const std::string& input) {
+    // Map of month abbreviations to numbers
+    std::unordered_map<std::string, int> monthMap = {
+        {"Jan", 1}, {"Feb", 2}, {"Mar", 3}, {"Apr", 4},
+        {"May", 5}, {"Jun", 6}, {"Jul", 7}, {"Aug", 8},
+        {"Sep", 9}, {"Oct", 10}, {"Nov", 11}, {"Dec", 12}
+    };
 
+    std::istringstream iss(input);
+    std::string monthStr;
+    int year;
+
+    // Parse the month and year from the input string
+    iss >> monthStr >> year;
+
+    // Check if the month string is valid
+    if (monthMap.find(monthStr) == monthMap.end()) {
+        return "Invalid month format";
+    }
+
+    // Format the output as "M/YYYY"
+    std::ostringstream oss;
+    oss << monthMap[monthStr] << "/" << (year);  // Assumes "24" means "2024"
+    
+    return oss.str();
+}
 
 
 

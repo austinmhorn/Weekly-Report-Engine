@@ -173,7 +173,7 @@ void writeAvailabilityReport(std::vector<Property>& properties)
         {
             const char* name = overviewReportNameMap.at(static_cast<OverviewReportDictionary>(prop.p_dict_key));
 
-            nameAndDate(outFS, name, sExportDate) << ((entry.p_status == "Excluded") ? "Yes" : "No") << ","
+            nameAndDate(outFS, name, sExportDate) << ((entry.p_is_excluded) ? "Yes" : "No") << ","
                                                   << entry.p_status << ","
                                                   << entry.p_building_unit << ","
                                                   << entry.p_unit_type << ","
@@ -212,6 +212,55 @@ void writeAvailabilityReport(std::vector<Property>& properties)
         }
     }
 
+    outFS.close();
+}
+
+void writeResidentRetentionReport(std::vector<Property>& properties)
+{
+    const std::string filename = OUTPUT_DIRECTORY_PATH + OUTPUT_RESIDENT_RETENTION_REPORT_FILENAME;
+
+    std::cout << "Writing file: \"" << filename << "\"" << std::endl;
+
+    std::ofstream outFS;
+    outFS.open(filename, std::ios::out);
+    outFS << "Property," 
+          << "Date," << "Period," 
+          << "Expiring Leases," 
+          << "Early Move Out," 
+          << "Early Move Out %," 
+          << "NTV," 
+          << "NTV %," 
+          << "Renewal," 
+          << "Renewal %," 
+          << "Transfers," 
+          << "Transfers %," 
+          << "Remaining Expiration," 
+          << "Remaining Expiration %," 
+          << "MTM," 
+          << "MTM %," 
+          << std::endl;
+
+    for (auto &prop: properties) {
+        for (auto &entry: prop.retention) {
+            outFS << overviewReportNameMap.at(static_cast<OverviewReportDictionary>(prop.p_dict_key)) << ","
+                  << sExportDate << ","
+                  << transformDatePeriodStr(entry.p_month) << ","
+                  << entry.p_expiring_leases << ","
+                  << entry.p_early_move_out << ","
+                  << static_cast<float>(entry.p_early_move_out) / static_cast<float>(entry.p_expiring_leases) << ","
+                  << entry.p_ntv << ","
+                  << static_cast<float>(entry.p_ntv) / static_cast<float>(entry.p_expiring_leases) << ","
+                  << entry.p_renewals + entry.p_renewal_transfers << ","
+                  << static_cast<float>(entry.p_renewals + entry.p_renewal_transfers) / static_cast<float>(entry.p_expiring_leases) << ","
+                  << entry.p_transfers << ","
+                  << static_cast<float>(entry.p_transfers) / static_cast<float>(entry.p_expiring_leases) << ","
+                  << entry.p_pending << ","
+                  << static_cast<float>(entry.p_pending) / static_cast<float>(entry.p_expiring_leases) << ","
+                  << entry.p_mtm << ","
+                  << static_cast<float>(entry.p_mtm) / static_cast<float>(entry.p_expiring_leases) << "," 
+                  << std::endl;
+        }
+    }
 
     outFS.close();
 }

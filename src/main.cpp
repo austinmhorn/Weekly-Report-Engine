@@ -20,6 +20,8 @@ void injectData(std::vector<Property>& properties)
 void writeData(std::vector<Property>& properties)
 {
     writeOverviewReport(properties);
+    writeAvailabilityReport(properties);
+    writeResidentRetentionReport(properties);
 }
 
 int main(int argc, const char **argv) 
@@ -29,7 +31,7 @@ int main(int argc, const char **argv)
     std::vector<Property> properties;
 
     injectData(properties);
-    
+
     writeData(properties);
 
     return 0;

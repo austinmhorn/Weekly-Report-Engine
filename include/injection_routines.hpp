@@ -153,7 +153,7 @@ void injectAvailabilityReport(std::vector<Property>& properties)
 
     do {
         try {
-            for (; currRow < numRows; currRow++) {
+            for (; currRow < numRows ; currRow++) {
                 AvailabilityData data;
                 
                 data.p_name           = doc.GetCell<std::string>("Property", currRow);
@@ -171,25 +171,42 @@ void injectAvailabilityReport(std::vector<Property>& properties)
                     doc.GetCell<std::string>("Available On", currRow), 
                     "%m/%d/%Y"
                     );
-                data.p_budgeted_rent = std::stof(removeCommas(doc.GetCell<std::string>("Budgeted Rent", currRow)));
                 data.p_scheduled_move_in = stotm(
                     doc.GetCell<std::string>("Scheduled Move-In", currRow), 
                     "%m/%d/%Y"
                     );
 
-                data.p_unit_notes = doc.GetCell<std::string>("Unit Notes", currRow);
-                data.p_unit_activity_notes = doc.GetCell<std::string>("Unit Activity Notes", currRow);
-                data.p_hazard_note = doc.GetCell<std::string>("Hazard Note", currRow);
-                data.p_est_vacancy_cost = std::stof(removeCommas(doc.GetCell<std::string>("Est. Vacany Cost", currRow)));
+                //data.p_unit_notes = doc.GetCell<std::string>("Unit Notes", currRow);
+                //data.p_unit_activity_notes = doc.GetCell<std::string>("Unit Activity Notes", currRow);
+                //data.p_hazard_note = doc.GetCell<std::string>("Hazard Note", currRow);
+                data.p_budgeted_rent = parseFloatWithCommaAndParentheses(doc.GetCell<std::string>("Budgeted Rent", currRow));
+                data.p_prior_lease_rent = parseFloatWithCommaAndParentheses(doc.GetCell<std::string>("Prior Lease Rent", currRow));
+                data.p_best_price = parseFloatWithCommaAndParentheses(doc.GetCell<std::string>("Best Price", currRow));
+                data.p_market_rent = parseFloatWithCommaAndParentheses(doc.GetCell<std::string>("Market Rent", currRow));
 
-                //std::cout << currRow-2 << " " << data.p_name << " " << notes << std::endl;
+                std::string futureLeaseRentStr = doc.GetCell<std::string>("Future Lease Rent", currRow);
+                if (futureLeaseRentStr.size()) {
+                    data.p_future_lease_rent = parseFloatWithCommaAndParentheses(futureLeaseRentStr);
+                }
+                else {
+                    data.p_future_lease_rent_str = "";
+                } 
+
+                data.p_est_vacancy_cost = parseFloatWithCommaAndParentheses(doc.GetCell<std::string>("Est. Vacancy Cost", currRow));
+
+                data.p_lease_completed = stotm(
+                    doc.GetCell<std::string>("Lease Completed", currRow), 
+                    "%m/%d/%Y"
+                    );
+
+                //std::cout << currRow-2 << " " << data.p_name << " " << data.p_building_unit << std::endl;
 
                 dataList.push_back(data);
             }
             finished = true;
         }
         catch (const std::exception& except) {
-            //std::cerr << except.what() << std::endl;
+            std::cerr << "Error at row " << currRow << ": " << except.what() << std::endl;
             currRow++;
         }
     }
@@ -560,7 +577,13 @@ void injectGrossPotentialRentReport(std::vector<Property>& properties)
 
         // Read each column and assign to the struct
         data.p_name = doc.GetCell<std::string>("Property", i);
-        data.p_unit_space_count = doc.GetCell<int>("Unit Space Count", i);
+
+        std::string unitSpaceCountStr = doc.GetCell<std::string>("Unit Space Count", i);
+        
+        data.p_unit_space_count = (unitSpaceCountStr.size()) 
+            ? std::stoi(unitSpaceCountStr) 
+            : 0;
+
         data.p_gpr_market_rent = parseFloatWithCommaAndParentheses(doc.GetCell<std::string>("GPR - Market Rent", i));
         data.p_total_potential_rent = parseFloatWithCommaAndParentheses(doc.GetCell<std::string>("Total Potential Rent", i));
         data.p_gain_loss_to_lease = parseFloatWithCommaAndParentheses(doc.GetCell<std::string>("Gain/Loss to Lease", i));
