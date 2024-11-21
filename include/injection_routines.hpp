@@ -10,24 +10,14 @@
 #include "dictionaries.hpp"
 #include "helper_functions.hpp"
 
-static const std::string DASHBOARD_REPORT_FILENAME                  = "data/" + getFormattedDate(".") + "/clean/Birchstone Dashboard.csv";
-static const std::string AVAILABILITY_REPORT_FILENAME               = "data/" + getFormattedDate(".") + "/clean/Availability.csv";
-static const std::string MOVE_OUT_REASONS_REPORT_FILENAME           = "data/" + getFormattedDate(".") + "/clean/Move Out Reasons.csv";
-static const std::string BOX_SCORE_LEAD_CONVERSIONS_FILENAME        = "data/" + getFormattedDate(".") + "/clean/Box Score - Lead Conversions.csv";
-static const std::string BOX_SCORE_MAKE_READY_STATUS_FILENAME       = "data/" + getFormattedDate(".") + "/clean/Box Score - Make Ready Status.csv";
-static const std::string BOX_SCORE_PROPERTY_PULSE_FILENAME          = "data/" + getFormattedDate(".") + "/clean/Box Score - Property Pulse.csv";
-static const std::string RESIDENT_RETENTION_FILENAME                = "data/" + getFormattedDate(".") + "/clean/Resident Retention.csv";
-static const std::string RECEIPTS_BY_CHARGE_CODE_FILENAME           = "data/" + getFormattedDate(".") + "/clean/Receipts By Charge Code (Rent).csv";
-static const std::string GROSS_POTENTIAL_RENT_FILENAME              = "data/" + getFormattedDate(".") + "/clean/Gross Potential Rent.csv";
-static const std::string WORK_ORDER_PERFORMANCE_FILENAME            = "data/" + getFormattedDate(".") + "/clean/Work Order Performance.csv";
-static const std::string RESIDENT_AGED_RECEIVABLES_DETAIL_FILENAME  = "data/" + getFormattedDate(".") + "/clean/Resident Aged Receivables (Detail).csv";
-static const std::string RESIDENT_AGED_RECEIVABLES_SUMMARY_FILENAME = "data/" + getFormattedDate(".") + "/clean/Resident Aged Receivables (Summary).csv";
 
 /// @brief  Inject Dashboard Report data into vector
 /// @param properties 
 void injectDashboardReport(std::vector<Property>& properties)
 {
     PRINT_FUNCTION_START();
+
+    static const std::string DASHBOARD_REPORT_FILENAME = "data/" + sExportDate + "/clean/Birchstone Dashboard.csv";
 
     rapidcsv::Document doc(DASHBOARD_REPORT_FILENAME, rapidcsv::LabelParams(0, 0));
     std::vector<std::string> columnNames = doc.GetColumnNames();
@@ -145,6 +135,8 @@ void injectAvailabilityReport(std::vector<Property>& properties)
 {
     PRINT_FUNCTION_START();
 
+    static const std::string AVAILABILITY_REPORT_FILENAME = "data/" + sExportDate + "/clean/Availability.csv";
+
     rapidcsv::Document doc(AVAILABILITY_REPORT_FILENAME);
     int numRows = doc.GetRowCount();
     int currRow = 0;
@@ -158,9 +150,10 @@ void injectAvailabilityReport(std::vector<Property>& properties)
                 
                 data.p_name           = doc.GetCell<std::string>("Property", currRow);
                 data.p_building_unit  = doc.GetCell<std::string>("Bldg-Unit", currRow);
+                data.p_status         = doc.GetCell<std::string>("Unit Status", currRow);
                 data.p_floorplan      = doc.GetCell<std::string>("Floor Plan", currRow);
                 data.p_unit_type      = doc.GetCell<std::string>("Unit Type", currRow);
-                data.p_exclusion_name = doc.GetCell<std::string>("Exclusion Name", currRow);
+                data.p_exclusion_name = trimDoubleQuotes(doc.GetCell<std::string>("Exclusion Name", currRow));
                 data.p_days_vacant    = doc.GetCell<int>("Days Vacant", currRow);
                 
                 data.p_move_out = stotm(
@@ -225,6 +218,8 @@ void injectAvailabilityReport(std::vector<Property>& properties)
 void injectMoveOutReasonsReport(std::vector<Property>& properties)
 {
     PRINT_FUNCTION_START();
+
+    static const std::string MOVE_OUT_REASONS_REPORT_FILENAME = "data/" + sExportDate + "/clean/Move Out Reasons.csv";
 
     // Create a vector of MoveOutData structs to store the results
     std::vector<MoveOutData> moveOutDataList;
@@ -295,6 +290,8 @@ void injectBoxScoreLeadConversionsReport(std::vector<Property>& properties)
 {
     PRINT_FUNCTION_START();
 
+    static const std::string BOX_SCORE_LEAD_CONVERSIONS_FILENAME = "data/" + sExportDate + "/clean/Box Score - Lead Conversions.csv";
+
     // Load the CSV document; row 0 is the header and no label column
     rapidcsv::Document doc(BOX_SCORE_LEAD_CONVERSIONS_FILENAME, rapidcsv::LabelParams(0, -1));
 
@@ -337,6 +334,8 @@ void injectBoxScoreLeadConversionsReport(std::vector<Property>& properties)
 void injectBoxScoreMakeReadyStatusReport(std::vector<Property>& properties)
 {
     PRINT_FUNCTION_START();
+
+    static const std::string BOX_SCORE_MAKE_READY_STATUS_FILENAME = "data/" + sExportDate + "/clean/Box Score - Make Ready Status.csv";
 
     std::vector<BoxScoreMakeReadyStatusData> dataList;
     size_t numRows;
@@ -383,6 +382,8 @@ void injectBoxScoreMakeReadyStatusReport(std::vector<Property>& properties)
 void injectBoxScorePropertyPulseReport(std::vector<Property>& properties)
 {
     PRINT_FUNCTION_START();
+
+    static const std::string BOX_SCORE_PROPERTY_PULSE_FILENAME = "data/" + sExportDate + "/clean/Box Score - Property Pulse.csv";
 
     std::vector<BoxScorePropertyPulseData> dataList;
     std::size_t numRows;
@@ -437,6 +438,8 @@ void injectBoxScorePropertyPulseReport(std::vector<Property>& properties)
 void injectResidentRetentionReport(std::vector<Property>& properties)
 {
     PRINT_FUNCTION_START();
+
+    static const std::string RESIDENT_RETENTION_FILENAME = "data/" + sExportDate + "/clean/Resident Retention.csv";
 
     std::ifstream file(RESIDENT_RETENTION_FILENAME, std::ios::in);
     std::string line;
@@ -518,12 +521,14 @@ void injectResidentRetentionReport(std::vector<Property>& properties)
     PRINT_FUNCTION_STOP();
 }
 
-void injectReceiptsByChargeCodeReport(std::vector<Property>& properties)
+void injectReceiptsByChargeCode_Receipts_Report(std::vector<Property>& properties)
 {
     PRINT_FUNCTION_START();
 
+    static const std::string RECEIPTS_BY_CHARGE_CODE_RECEIPTS_FILENAME = "data/" + sExportDate + "/clean/Receipts By Charge Code (Rent) - Receipts.csv";
+
     // Create a document from the CSV file
-    rapidcsv::Document doc(RECEIPTS_BY_CHARGE_CODE_FILENAME);
+    rapidcsv::Document doc(RECEIPTS_BY_CHARGE_CODE_RECEIPTS_FILENAME);
     std::vector<ReceiptsData> dataList;
     std::size_t numRows = doc.GetRowCount();
 
@@ -561,9 +566,32 @@ void injectReceiptsByChargeCodeReport(std::vector<Property>& properties)
     PRINT_FUNCTION_STOP();
 }
 
+//void injectReceiptsByChargeCode_Pre_Payments_Report(std::vector<Property>& properties)
+//{
+//    PRINT_FUNCTION_START();
+//
+//    static const std::string RECEIPTS_BY_CHARGE_CODE_PREPAYMENTS_FILENAME = "data/" + sExportDate + "/clean/Receipts By Charge Code (Rent) - Pre-Payments.csv";
+//
+//    // Create a document from the CSV file
+//    rapidcsv::Document doc(RECEIPTS_BY_CHARGE_CODE_PREPAYMENTS_FILENAME);
+//    std::vector<ReceiptsData> dataList;
+//    std::size_t numRows = doc.GetRowCount();
+//
+//    for (std::size_t i = 0; i < numRows; i++)
+//    {
+//
+//    }
+//
+//    PRINT_NUM_ITEMS_PROCESSED(numRows);
+//
+//    PRINT_FUNCTION_STOP();
+//}
+
 void injectGrossPotentialRentReport(std::vector<Property>& properties)
 {
     PRINT_FUNCTION_START();
+
+    static const std::string GROSS_POTENTIAL_RENT_FILENAME = "data/" + sExportDate + "/clean/Gross Potential Rent.csv";
 
     // Create a document from the CSV file
     rapidcsv::Document doc(GROSS_POTENTIAL_RENT_FILENAME);
@@ -614,6 +642,8 @@ void injectWorkOrderPerformance(std::vector<Property>& properties)
 {
     PRINT_FUNCTION_START();
 
+    static const std::string WORK_ORDER_PERFORMANCE_FILENAME = "data/" + sExportDate + "/clean/Work Order Performance.csv";
+
     // Create a document from the CSV file
     rapidcsv::Document doc(WORK_ORDER_PERFORMANCE_FILENAME);
     std::vector<WorkOrderPerformanceData> dataList;
@@ -661,6 +691,8 @@ void injectResidentAgedReceivablesDetailReport(std::vector<Property>& properties
 {
     PRINT_FUNCTION_START();
 
+    static const std::string RESIDENT_AGED_RECEIVABLES_DETAIL_FILENAME = "data/" + sExportDate + "/clean/Resident Aged Receivables (Detail).csv";
+
     // Create a document from the CSV file
     rapidcsv::Document doc(RESIDENT_AGED_RECEIVABLES_DETAIL_FILENAME);
     std::vector<ResidentAgedReceivablesDetailData> dataList;
@@ -691,7 +723,7 @@ void injectResidentAgedReceivablesDetailReport(std::vector<Property>& properties
                 }
 
                 // Use the helper function to handle commas and parentheses in financial data
-                data.p_unallocated_charges_x_credits = parseFloatWithCommaAndParentheses(doc.GetCell<std::string>("Unallocated Charges / Credits", currRow));
+                data.p_delinquent_total = parseFloatWithCommaAndParentheses(doc.GetCell<std::string>("Delinquent Total", currRow));
                 data.p_0_to_30_days = parseFloatWithCommaAndParentheses(doc.GetCell<std::string>("0-30 Days", currRow));
                 data.p_31_to_60_days = parseFloatWithCommaAndParentheses(doc.GetCell<std::string>("31-60 Days", currRow));
                 data.p_61_to_90_days = parseFloatWithCommaAndParentheses(doc.GetCell<std::string>("61-90 Days", currRow));
@@ -728,6 +760,8 @@ void injectResidentAgedReceivablesSummaryReport(std::vector<Property>& propertie
 {
     PRINT_FUNCTION_START();
 
+    static const std::string RESIDENT_AGED_RECEIVABLES_SUMMARY_FILENAME = "data/" + sExportDate + "/clean/Resident Aged Receivables (Summary).csv";
+
     // Create a document from the CSV file
     rapidcsv::Document doc(RESIDENT_AGED_RECEIVABLES_SUMMARY_FILENAME);
     std::vector<ResidentAgedReceivablesSummaryData> dataList;
@@ -757,6 +791,204 @@ void injectResidentAgedReceivablesSummaryReport(std::vector<Property>& propertie
         for (auto &entry: dataList)
             if (prop.dash.p_name == entry.p_name)
                 prop.receivablesSummary.push_back(entry);
+
+    PRINT_NUM_ITEMS_PROCESSED(numRows);
+
+    PRINT_FUNCTION_STOP();
+}
+
+void injectIncomeStatementReport(std::vector<Property>& properties)
+{
+    PRINT_FUNCTION_START();
+
+    static const std::string INCOME_STATEMENT_FILENAME = "data/" + sExportDate + "/clean/Income Statement.csv";
+
+    rapidcsv::Document doc(INCOME_STATEMENT_FILENAME);
+    std::ifstream file(INCOME_STATEMENT_FILENAME, std::ios::in);
+    std::string line;
+    std::vector<IncomeStatementData> dataList;
+    int row = 0;
+    std::vector<std::string> columnNames;
+
+    while ( !file.eof() )
+    {
+        std::getline(file, line);
+        std::stringstream ss(line);
+
+        if ( !line.size() ) // Found empty row
+            break;
+
+        if ( row == 0 )
+        {
+            std::string headerTitle;
+            std::getline(ss, headerTitle, ',');
+            std::getline(ss, headerTitle, ',');
+            std::getline(ss, headerTitle, ',');
+
+            std::getline(ss, headerTitle, ',');
+            columnNames.push_back(trimDoubleQuotes(headerTitle));
+            std::getline(ss, headerTitle, ',');
+            columnNames.push_back(trimDoubleQuotes(headerTitle));
+            std::getline(ss, headerTitle, ',');
+            columnNames.push_back(trimDoubleQuotes(headerTitle));
+            std::getline(ss, headerTitle, ',');
+            columnNames.push_back(trimDoubleQuotes(headerTitle));
+            std::getline(ss, headerTitle, ',');
+            columnNames.push_back(trimDoubleQuotes(headerTitle));
+            std::getline(ss, headerTitle, ',');
+            columnNames.push_back(trimDoubleQuotes(headerTitle));
+            std::getline(ss, headerTitle, ',');
+            columnNames.push_back(trimDoubleQuotes(headerTitle));
+            std::getline(ss, headerTitle, ',');
+            columnNames.push_back(trimDoubleQuotes(headerTitle));
+            std::getline(ss, headerTitle, ',');
+            columnNames.push_back(trimDoubleQuotes(headerTitle));
+            std::getline(ss, headerTitle, ',');
+            columnNames.push_back(trimDoubleQuotes(headerTitle));
+            std::getline(ss, headerTitle, ',');
+            columnNames.push_back(trimDoubleQuotes(headerTitle));
+            std::getline(ss, headerTitle, ',');
+            columnNames.push_back(trimDoubleQuotes(headerTitle));
+        }
+        else
+        {
+            IncomeStatementData data;
+            std::string token;
+
+            std::getline(ss, token, ',');
+            data.p_name = trimDoubleQuotes(token);
+
+            std::getline(ss, token, ',');
+            data.p_unit_count = std::stoi(trimDoubleQuotes(token));
+
+            std::getline(ss, token, ',');
+            data.p_account_name = trimDoubleQuotes(token);
+
+            if ( data.p_account_name == "Rent - Resident" ) {
+                token = doc.GetCell<std::string>(columnNames.at(0), row-1);
+                token = removeCommas(token);
+                data.p_balance_11_months_ago.first = columnNames.at(0);
+                data.p_balance_11_months_ago.second = std::stof(token);
+
+                token = doc.GetCell<std::string>(columnNames.at(1), row-1);
+                token = removeCommas(token);
+                data.p_balance_10_months_ago.first = columnNames.at(1);
+                data.p_balance_10_months_ago.second = std::stof(token);
+
+                token = doc.GetCell<std::string>(columnNames.at(2), row-1);
+                token = removeCommas(token);
+                data.p_balance_9_months_ago.first = columnNames.at(2);
+                data.p_balance_9_months_ago.second = std::stof(token);
+
+                token = doc.GetCell<std::string>(columnNames.at(3), row-1);
+                token = removeCommas(token);
+                data.p_balance_8_months_ago.first = columnNames.at(3);
+                data.p_balance_8_months_ago.second = std::stof(token);
+
+                token = doc.GetCell<std::string>(columnNames.at(4), row-1);
+                token = removeCommas(token);
+                data.p_balance_7_months_ago.first = columnNames.at(4);
+                data.p_balance_7_months_ago.second = std::stof(token);
+
+                token = doc.GetCell<std::string>(columnNames.at(5), row-1);
+                token = removeCommas(token);
+                data.p_balance_6_months_ago.first = columnNames.at(5);
+                data.p_balance_6_months_ago.second = std::stof(token);
+
+                token = doc.GetCell<std::string>(columnNames.at(6), row-1);
+                token = removeCommas(token);
+                data.p_balance_5_months_ago.first = columnNames.at(6);
+                data.p_balance_5_months_ago.second = std::stof(token);
+
+                token = doc.GetCell<std::string>(columnNames.at(7), row-1);
+                token = removeCommas(token);
+                data.p_balance_4_months_ago.first = columnNames.at(7);
+                data.p_balance_4_months_ago.second = std::stof(token);
+
+                token = doc.GetCell<std::string>(columnNames.at(8), row-1);
+                token = removeCommas(token);
+                data.p_balance_3_months_ago.first = columnNames.at(8);
+                data.p_balance_3_months_ago.second = std::stof(token);
+
+                token = doc.GetCell<std::string>(columnNames.at(9), row-1);
+                token = removeCommas(token);
+                data.p_balance_2_months_ago.first = columnNames.at(9);
+                data.p_balance_2_months_ago.second = std::stof(token);
+
+                token = doc.GetCell<std::string>(columnNames.at(10), row-1);
+                token = removeCommas(token);
+                data.p_balance_1_months_ago.first = columnNames.at(10);
+                data.p_balance_1_months_ago.second = std::stof(token);
+
+                token = doc.GetCell<std::string>(columnNames.at(11), row-1);
+                token = removeCommas(token);
+                data.p_balance_0_months_ago.first = columnNames.at(11);
+                data.p_balance_0_months_ago.second = std::stof(token);
+
+                token = doc.GetCell<std::string>("Total", row-1);
+                token = removeCommas(token);
+                data.p_balance_total = std::stof(token);
+
+                dataList.push_back(data);
+            }
+        }
+
+        row++;
+    }
+    
+    for (auto& entry: dataList)
+        for (auto &prop: properties)
+            if (entry.p_name == prop.dash.p_name)
+                prop.income = entry;
+
+    file.close();
+    
+    PRINT_NUM_ITEMS_PROCESSED(row-1);
+
+    PRINT_FUNCTION_STOP();
+}
+
+void injectDailyAndWeeklyOperationsReport(std::vector<Property>& properties)
+{
+    PRINT_FUNCTION_START();
+
+    static const std::string DAILY_AND_WEEKLY_OPERATIONS_FILENAME = "data/" + sExportDate + "/clean/Daily and Weekly Operations.csv";
+
+    std::vector<DailyAndWeeklyOperationsData> dataList;
+    std::size_t numRows;
+
+    try 
+    {
+        // Load the CSV document; row 0 is the header and no label column
+        rapidcsv::Document doc(DAILY_AND_WEEKLY_OPERATIONS_FILENAME, rapidcsv::LabelParams(0, -1));
+
+        // Get the total row count (excluding the header row)
+        numRows = doc.GetRowCount();
+
+        // Iterate over each row and populate the struct fields
+        for (size_t row = 0; row < numRows; ++row) 
+        {
+            DailyAndWeeklyOperationsData data;
+
+            // Parse and assign each field from the corresponding CSV column
+            data.p_name = doc.GetCell<std::string>("Property", row);
+            data.p_lead_source = doc.GetCell<std::string>("Lead Source", row);
+            data.p_new_leads = doc.GetCell<int>("New Leads", row);
+            data.p_first_visit_tour = doc.GetCell<int>("First Visit/Tour", row);
+
+            // Add the populated struct to our data list
+            dataList.push_back(data);
+        }
+    } 
+    catch (const std::exception& e) 
+    {
+        std::cerr << "Error reading CSV: " << e.what() << std::endl;
+    }
+
+    for (auto& entry: dataList)
+        for (auto &prop: properties)
+            if (entry.p_name == prop.dash.p_name)
+                prop.ops.push_back(entry);
 
     PRINT_NUM_ITEMS_PROCESSED(numRows);
 

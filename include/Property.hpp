@@ -234,7 +234,7 @@ struct ResidentAgedReceivablesDetailData
     std::string p_resident_lname;
     std::string p_lease_status;
     std::tm p_eviction_start_date;
-    float p_unallocated_charges_x_credits;
+    float p_delinquent_total;
     float p_0_to_30_days;
     float p_31_to_60_days;
     float p_61_to_90_days;
@@ -260,6 +260,37 @@ struct ResidentAgedReceivablesSummaryData
 };
 
 
+typedef std::pair<std::string, float> balance_data;
+struct IncomeStatementData
+{
+    std::string p_name;
+    int p_unit_count;
+    std::string p_account_name;
+    balance_data p_balance_11_months_ago;
+    balance_data p_balance_10_months_ago;
+    balance_data p_balance_9_months_ago;
+    balance_data p_balance_8_months_ago;
+    balance_data p_balance_7_months_ago;
+    balance_data p_balance_6_months_ago;
+    balance_data p_balance_5_months_ago;
+    balance_data p_balance_4_months_ago;
+    balance_data p_balance_3_months_ago;
+    balance_data p_balance_2_months_ago;
+    balance_data p_balance_1_months_ago;
+    balance_data p_balance_0_months_ago;
+    float p_balance_total;
+};
+
+
+struct DailyAndWeeklyOperationsData
+{
+    std::string p_name;
+    std::string p_lead_source;
+    int p_new_leads;
+    int p_first_visit_tour;
+};
+
+
 struct Property
 {
     Property() = default;
@@ -280,6 +311,8 @@ struct Property
     std::vector<WorkOrderPerformanceData>           workOrder;
     std::vector<ResidentAgedReceivablesDetailData>  receivablesDetail;
     std::vector<ResidentAgedReceivablesSummaryData> receivablesSummary;
+    IncomeStatementData                             income;
+    std::vector<DailyAndWeeklyOperationsData>       ops;
 };
 
 #endif /* __Property_hpp */

@@ -7,6 +7,12 @@
 #include <ctime>
 #include <sstream>
 
+// Declaration
+std::string getFormattedDate(const std::string& delimiter);
+
+static std::string sExportDate;
+static std::string sExportDate_Forward_Slash_Format;
+
 #define PRINT_FUNCTION_START() std::cout << "\033[32m" << "~ Starting" << "\e[0m" << " - " << __func__ << "()" << std::endl;
 #define PRINT_FUNCTION_STOP() std::cout << "\033[31m" << "~ Stopping" << "\e[0m" << " - " << __func__ << "()" << std::endl;
 
@@ -190,6 +196,12 @@ std::string transformDatePeriodStr(const std::string& input) {
     return oss.str();
 }
 
-
+void replaceDotsWithSlashes(std::string& str) {
+    for (char& ch : str) {
+        if (ch == '.') {
+            ch = '/';
+        }
+    }
+}
 
 #endif /* __helper_functions_hpp */

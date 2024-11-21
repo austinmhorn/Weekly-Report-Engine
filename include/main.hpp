@@ -4,10 +4,10 @@
 #include "injection_routines.hpp"
 #include "output_routines.hpp"
 
-void inflateAttachmentsDir() noexcept(false)
+void inflateAttachmentsDir(const std::string& date) noexcept(false) 
 {
     std::string attachmentsDir = "attachments";
-    std::string destDir = "data/" + getFormattedDate(".") + "/raw";
+    std::string destDir = "data/" + date + "/raw";
 
     // Find the ZIP file in the attachments directory
     std::string zipFilePath = findZipFile(attachmentsDir);
@@ -23,7 +23,8 @@ void inflateAttachmentsDir() noexcept(false)
     }
 }
 
-bool copyCsvFiles(const std::string& sourceDir, const std::string& destDir) {
+bool copyCsvFiles(const std::string& sourceDir, const std::string& destDir) 
+{
     // Ensure the source directory exists
     if (!fs::exists(sourceDir) || !fs::is_directory(sourceDir)) {
         std::cerr << "Source directory does not exist or is not a directory: " << sourceDir << std::endl;
@@ -44,14 +45,14 @@ bool copyCsvFiles(const std::string& sourceDir, const std::string& destDir) {
                 std::string filename = entry.path().filename();
                 std::string newFilePath = "";
                 
-                if ( filename == "03. Weekly Report_Receipts By Charge Codes.csv" ) {
-                    newFilePath = destDir + "/" + "Receipts By Charge Code (All).csv";
-                }
-                else if ( filename == "04. Weekly Report_Gross Potential Rent (GPR).csv" ) {
+                if ( filename == "04. Weekly Report_Gross Potential Rent (GPR).csv" ) {
                     newFilePath = destDir + "/" + "Gross Potential Rent.csv";
                 }
-                else if ( filename == "05. Weekly Report_Receipt By Charge Code RENT only.csv" ) {
-                    newFilePath = destDir + "/" + "Receipts By Charge Code (Rent).csv";
+                else if ( filename.find("Receipt By Charge Code RENT only - Pre-Payments.csv") != SIZE_MAX ) {
+                    newFilePath = destDir + "/" + "Receipts By Charge Code (Rent) - Pre-Payments.csv";
+                }
+                else if ( filename.find("Receipt By Charge Code RENT only - Receipts.csv") != SIZE_MAX ) {
+                    newFilePath = destDir + "/" + "Receipts By Charge Code (Rent) - Receipts.csv";
                 }
                 else if ( filename == "06-07. Weekly Report_Resident Aged Receivables - Detail.csv" ) {
                     newFilePath = destDir + "/" + "Resident Aged Receivables (Detail).csv";
@@ -86,16 +87,15 @@ bool copyCsvFiles(const std::string& sourceDir, const std::string& destDir) {
                 else if ( filename == "12. Weekly Report_Work Order Performance.csv" ) {
                     newFilePath = destDir + "/" + "Work Order Performance.csv";
                 }
-                //else if ( filename.find("Weekly Report_Lease Activity - Lease Modifications Approved") != SIZE_MAX ) {
-                //    newFilePath = destDir + "/" + "Box Score - Lease Modifications (Approved).csv";
-                //}
-                //else if ( filename.find("Weekly Report_Lease Activity - Lease Modifications Started") != SIZE_MAX ) {
-                //    newFilePath = destDir + "/" + "Box Score - Lease Modifications (Started).csv";
-                //}
                 else if ( filename == "Birchstone Dashboard v2.3.csv" ) {
                     newFilePath = destDir + "/" + "Birchstone Dashboard.csv";
                 }
-
+                else if ( filename == "17. Daily and Weekly Operations.csv" ) {
+                    newFilePath = destDir + "/" + "Daily and Weekly Operations.csv";
+                }
+                else if ( filename == "16. Income Statement as Cash.csv" ) {
+                    newFilePath = destDir + "/" + "Income Statement.csv";
+                }
 
                 if ( newFilePath.size() ) {
                     // Copy the file to the destination directory
@@ -112,15 +112,15 @@ bool copyCsvFiles(const std::string& sourceDir, const std::string& destDir) {
     return true;
 }
 
-void cleanFiles() 
+void cleanFiles(const std::string& date) 
 {
-    std::string srcDir = "data/" + getFormattedDate(".") + "/raw";
-    std::string destDir = "data/" + getFormattedDate(".") + "/clean";
+    std::string srcDir = "data/" + date + "/raw";
+    std::string destDir = "data/" + date + "/clean";
 
     copyCsvFiles(srcDir, destDir);
 }
 
-void init(const std::string& date = getFormattedDate("."))
+void init(const std::string& date) 
 {
     std::string path = "data/" + date + "/clean";
     std::cout << "~ Generating for:\t\t (" << date << ")" << std::endl;
@@ -131,13 +131,12 @@ void init(const std::string& date = getFormattedDate("."))
     }
 
     try {
-        inflateAttachmentsDir();
-        cleanFiles();
+        inflateAttachmentsDir(date);
+        cleanFiles(date);
     }
     catch(const std::exception& e) {
         std::cerr << e.what() << std::endl;
     }
 }
-
 
 #endif /* __main_hpp */
