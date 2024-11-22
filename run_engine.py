@@ -1,81 +1,75 @@
-import subprocess
-from datetime import datetime
 import os
+import subprocess
 import sys
+from datetime import datetime
 
-# Set the working directory to the script's directory
-script_dir = os.path.dirname(os.path.abspath(__file__))
-os.chdir(script_dir)
-
-# Function to build the program (CMake)
-def build_program():
-    subprocess.run(['cmake', '-S', '.', '-B', 'build'])
-
-# Function to run a program and log its output with a timestamp
-def run_and_log_with_timestamp_in_logs(program_path):
-    """
-    Runs a C++ program and redirects its output to a timestamped file in the 'logs' directory.
-    
-    :param program_path: Path to the compiled C++ program.
-    """
-    # Ensure the logs directory exists
-    logs_dir = "logs"
-    os.makedirs(logs_dir, exist_ok=True)
-    
-    # Create a timestamped filename
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    output_file = os.path.join(logs_dir, f"output_{timestamp}.txt")
-    
-    try:
-        with open(output_file, "w") as file:
-            # Run the program and redirect both stdout and stderr to the file
-            subprocess.run(
-                [program_path], stdout=file, stderr=subprocess.STDOUT, check=True
-            )
-        print(f"Output has been saved to {output_file}.")
-    except subprocess.CalledProcessError as e:
-        print(f"Error while running the program: {e}")
-    except FileNotFoundError:
-        print(f"Program not found: {program_path}")
-
-# Get the date from the command-line arguments or default to today's date
-if len(sys.argv) > 1:
-    date_provided = sys.argv[1]
-else:
-    # Default to today's date in 'YYYY.MM.DD' format
-    date_provided = datetime.today().strftime('%Y.%m.%d')
-
-print(f"Running with date: {date_provided}")
-
-#build_program()
-
-subprocess.run('rm -R attachments/*', shell=True)
-
-# Log file setup for parse_inbox.py
+# Log file setup
 logs_dir = "logs"
 os.makedirs(logs_dir, exist_ok=True)
 timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-log_file_path = os.path.join(logs_dir, f"output_{timestamp}.txt")
+log_file_path = os.path.join(logs_dir, f"run_engine_{timestamp}.txt")
 
-with open(log_file_path, "a") as log_file:
+# Redirect all output to the same log file
+def log_message(message):
+    with open(log_file_path, "a") as log_file:
+        log_file.write(f"{message}\n")
+    print(message)
+
+# Execute a script and log its output
+def execute_script(script, *args):
+    command = ["python3", script] + list(args)
+    log_message(f"Executing: {' '.join(command)}")
+    with open(log_file_path, "a") as log_file:
+        process = subprocess.Popen(command, stdout=log_file, stderr=log_file)
+        process.wait()
+    if process.returncode == 0:
+        log_message(f"✅ {script} completed successfully.")
+    else:
+        log_message(f"❌ {script} failed with return code {process.returncode}.")
+
+# Get the date from the command line argument or default to today's date
+if len(sys.argv) == 2:
     try:
-        # Run parse_inbox.py and log output
-        subprocess.run(['python3', 'parse_inbox.py', date_provided], stdout=log_file, stderr=subprocess.STDOUT, check=True)
-        print(f"parse_inbox.py executed successfully. Output logged to {log_file_path}.")
-    except subprocess.CalledProcessError as e:
-        print(f"Error while executing parse_inbox.py: {e}")
-    except FileNotFoundError:
-        print("The parse_inbox.py script was not found. Make sure it's in the same directory.")
+        provided_date = sys.argv[1]
+        datetime.strptime(provided_date, "%Y.%m.%d")  # Validate date format
+        log_message(f"Using provided date: {provided_date}")
+    except ValueError:
+        log_message("❌ Error: The provided date must be in the format YYYY.MM.DD")
+        sys.exit(1)
+else:
+    provided_date = datetime.now().strftime("%Y.%m.%d")
+    log_message(f"No date provided. Defaulting to today's date: {provided_date}")
 
-# Run the C++ program (build and log its output)
-run_and_log_with_timestamp_in_logs("./build/Weekly-Report-Engine")
-
-with open(log_file_path, "a") as log_file:
+# Main workflow
+if __name__ == "__main__":
     try:
-        # Run append_sheet_injection.py and log output
-        subprocess.run(['python3', 'append_sheet_injection.py', date_provided], stdout=log_file, stderr=subprocess.STDOUT, check=True)
-        print(f"append_sheet_injection.py executed successfully. Output logged to {log_file_path}.")
-    except subprocess.CalledProcessError as e:
-        print(f"Error while executing append_sheet_injection.py: {e}")
-    except FileNotFoundError:
-        print("The append_sheet_injection.py script was not found. Make sure it's in the same directory.")
+        
+        # Step 1: Clean attachments directory
+        log_message("Cleaning attachments directory...")
+        clean_command = "rm -R attachments/*"
+        clean_process = subprocess.run(clean_command, shell=True, capture_output=True, text=True)
+        if clean_process.returncode == 0:
+            log_message("✅ Attachments directory cleaned successfully.")
+        else:
+            log_message(f"❌ Error cleaning attachments directory: {clean_process.stderr}")
+
+        # Step 2: Parse Gmail inbox
+        execute_script("parse_inbox.py", provided_date, "--log", log_file_path)
+
+        # Step 3: Run C++ program (Weekly-Report-Engine)
+        log_message("Executing Weekly-Report-Engine...")
+        process = subprocess.Popen(["./build/Weekly-Report-Engine"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        with open(log_file_path, "a") as log_file:
+            stdout, stderr = process.communicate()
+            log_file.write(stdout.decode())
+            log_file.write(stderr.decode())
+        if process.returncode == 0:
+            log_message("✅ Weekly-Report-Engine completed successfully.")
+        else:
+            log_message(f"❌ Weekly-Report-Engine failed with return code {process.returncode}.")
+
+        # Step 4: Append data to Google Sheets
+        execute_script("append_sheet_injection.py", provided_date, "--log", log_file_path)
+
+    except Exception as e:
+        log_message(f"❌ An error occurred: {e}")

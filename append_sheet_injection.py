@@ -5,20 +5,32 @@ import glob
 import os
 import sys
 import time
+import argparse
 from datetime import datetime
 from gspread.exceptions import APIError
 
-# Log file setup
-logs_dir = "logs"
-os.makedirs(logs_dir, exist_ok=True)
-timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-log_file_path = os.path.join(logs_dir, f"output_{timestamp}.txt")
+# Argument parsing
+parser = argparse.ArgumentParser()
+parser.add_argument("date", help="The date in YYYY.MM.DD format.")
+parser.add_argument("--log", help="Path to the log file.")
+args = parser.parse_args()
 
-# Function to write to log file
+# Log file setup
+if args.log:
+    log_file_path = args.log
+else:
+    logs_dir = "logs"
+    os.makedirs(logs_dir, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    log_file_path = os.path.join(logs_dir, f"append_sheet_injection_{timestamp}.txt")
+
+# Logging function
 def log_message(message):
     with open(log_file_path, "a") as log_file:
         log_file.write(f"{message}\n")
     print(message)  # Also print to console for immediate feedback
+
+log_message(f"Starting append_sheet_injection.py for date: {args.date}")
 
 # Extract the provided date or default to today's date
 if len(sys.argv) == 2:
