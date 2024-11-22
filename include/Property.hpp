@@ -27,6 +27,8 @@ struct AvailabilityData
     float p_market_rent;
     float p_prior_lease_rent;
     std::tm p_scheduled_move_in;
+    int p_turn_time_mo_avail;
+    std::string p_turn_time_mo_avail_str = "~";
     std::string p_unit_notes;
     std::string p_unit_activity_notes;
     std::string p_hazard_note;

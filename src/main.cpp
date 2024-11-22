@@ -7,7 +7,7 @@
 void injectData(std::vector<Property>& properties) 
 {
     injectDashboardReport(properties);
-    injectAvailabilityReport(properties);
+    //injectAvailabilityReport(properties);
     injectMoveOutReasonsReport(properties);
     injectBoxScoreLeadConversionsReport(properties);
     injectBoxScoreMakeReadyStatusReport(properties);
@@ -27,7 +27,7 @@ void injectData(std::vector<Property>& properties)
 void writeData(std::vector<Property>& properties)
 {
     writeOverviewReport(properties);
-    writeAvailabilityReport(properties);
+    //writeAvailabilityReport(properties);
     writeResidentRetentionReport(properties);
     writeIncomeStatementReport(properties);
     writeOperationsReport(properties);
@@ -81,6 +81,8 @@ int main(int argc, const char **argv)
 
     injectData(properties);
     writeData(properties);
+
+    simpleCopyAvailabilityReport(sExportDate);
 
     return 0;
 }

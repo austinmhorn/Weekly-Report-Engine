@@ -88,16 +88,13 @@ for csv_file in csv_files:
         worksheet = spreadsheet.worksheet(sheet_name)
     except gspread.exceptions.WorksheetNotFound:
         # If not found, create a new worksheet with that name
-        worksheet = spreadsheet.add_worksheet(title=sheet_name, rows="1000", cols="18")
+        worksheet = spreadsheet.add_worksheet(title=sheet_name, rows="1000", cols="26")
         log_message(f"Created new sheet: {sheet_name}")
 
     # Read the CSV file and skip the header row
     with open(csv_file, 'r', encoding='utf-8') as csvfile:
         reader = csv.reader(csvfile)
         data = list(reader)[1:]  # Skip the first row (header)
-
-    # Restrict data to only 18 columns if it has more
-    data = [row[:18] for row in data]
 
     # Find the next empty row in the worksheet
     existing_data = worksheet.get_all_values()
@@ -112,9 +109,13 @@ for csv_file in csv_files:
         worksheet.add_rows(required_rows - current_rows)
         log_message(f"Added {required_rows - current_rows} rows to '{sheet_name}' to accommodate new data.")
 
-    # Define the range to start updating from the next empty row, limited to columns A:R
+    # Determine the maximum number of columns in the data
+    max_cols = max(len(row) for row in data)
+    end_col = chr(64 + max_cols)  # Convert column number to letter (e.g., 1 -> A, 26 -> Z)
+
+    # Define the range dynamically based on the data
     start_cell = f'A{next_empty_row}'
-    end_cell = f'R{next_empty_row + len(data) - 1}'
+    end_cell = f'{end_col}{next_empty_row + len(data) - 1}'
 
     # Update the worksheet in one batch starting at the next empty row
     try:

@@ -204,4 +204,21 @@ void replaceDotsWithSlashes(std::string& str) {
     }
 }
 
+int daysBetweenDates(const std::tm& inputDate) {
+    // Get the current time
+    std::time_t currentTime = std::time(nullptr);
+    std::tm* currentDate = std::localtime(&currentTime);
+    
+    // Convert both dates to time_t for easy comparison
+    std::time_t inputTime = std::mktime(const_cast<std::tm*>(&inputDate));
+    
+    // Calculate the difference in seconds
+    double differenceInSeconds = std::difftime(currentTime, inputTime);
+    
+    // Convert seconds to days
+    int daysDifference = static_cast<int>(differenceInSeconds / (60 * 60 * 24));
+
+    return daysDifference;
+}
+
 #endif /* __helper_functions_hpp */

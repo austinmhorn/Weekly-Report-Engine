@@ -131,6 +131,7 @@ void injectDashboardReport(std::vector<Property>& properties)
     PRINT_FUNCTION_STOP();
 }
 
+/*
 void injectAvailabilityReport(std::vector<Property>& properties)
 {
     PRINT_FUNCTION_START();
@@ -152,6 +153,7 @@ void injectAvailabilityReport(std::vector<Property>& properties)
                 data.p_building_unit  = doc.GetCell<std::string>("Bldg-Unit", currRow);
                 data.p_status         = doc.GetCell<std::string>("Unit Status", currRow);
                 data.p_floorplan      = doc.GetCell<std::string>("Floor Plan", currRow);
+                data.p_sqft           = std::stoi(doc.GetCell<std::string>("SQFT", currRow));
                 data.p_unit_type      = doc.GetCell<std::string>("Unit Type", currRow);
                 data.p_exclusion_name = trimDoubleQuotes(doc.GetCell<std::string>("Exclusion Name", currRow));
                 data.p_days_vacant    = doc.GetCell<int>("Days Vacant", currRow);
@@ -169,6 +171,11 @@ void injectAvailabilityReport(std::vector<Property>& properties)
                     "%m/%d/%Y"
                     );
 
+                std::string turnTimeStr = doc.GetCell<std::string>("Turn Time [MO-Avail]", currRow);
+                if ( turnTimeStr.size() )
+                    data.p_turn_time_mo_avail = std::stoi(doc.GetCell<std::string>("Turn Time [MO-Avail]", currRow));
+                else
+                    data.p_turn_time_mo_avail_str = "";
                 //data.p_unit_notes = doc.GetCell<std::string>("Unit Notes", currRow);
                 //data.p_unit_activity_notes = doc.GetCell<std::string>("Unit Activity Notes", currRow);
                 //data.p_hazard_note = doc.GetCell<std::string>("Hazard Note", currRow);
@@ -214,6 +221,7 @@ void injectAvailabilityReport(std::vector<Property>& properties)
 
     PRINT_FUNCTION_STOP();
 }
+*/
 
 void injectMoveOutReasonsReport(std::vector<Property>& properties)
 {

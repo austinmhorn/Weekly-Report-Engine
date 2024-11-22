@@ -139,4 +139,15 @@ void init(const std::string& date)
     }
 }
 
+void simpleCopyAvailabilityReport(const std::string& date)
+{
+    std::string src = "data/" + date + "/clean/Availability.csv";
+    std::string dest = "data/" + date + "/bin/Availability Report.csv";
+
+    // Copy the file to the destination directory
+    fs::copy_file(src, dest, fs::copy_options::overwrite_existing);
+    std::cout << "Copied " << src << " to " << dest << std::endl;
+
+}
+
 #endif /* __main_hpp */

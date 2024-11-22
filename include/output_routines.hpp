@@ -218,6 +218,7 @@ void writeOverviewReport(std::vector<Property>& properties)
     outFS.close();
 }
 
+/*
 void writeAvailabilityReport(std::vector<Property>& properties)
 {
     const std::string path = OUTPUT_DIRECTORY_PATH + OUTPUT_AVAILABILITY_REPORT_FILENAME;
@@ -241,6 +242,10 @@ void writeAvailabilityReport(std::vector<Property>& properties)
           << "Days Vacant," 
           << "Est. Vacancy Cost," 
           << "Available On," 
+          << "Scheduled Move-In,"
+          << "Days Until Move-In,"
+          << "Turn Time [MO-Avail],"
+          << "Available Date Exclusion,"
           << "Best Price," 
           << "Budgeted Rent," 
           << "Future Lease Rent," 
@@ -256,14 +261,14 @@ void writeAvailabilityReport(std::vector<Property>& properties)
             const char* name = overviewReportNameMap.at(static_cast<OverviewReportDictionary>(prop.p_dict_key));
 
             nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << ((entry.p_status == "Excluded") ? "Yes" : "No") << ","
-                                                  << entry.p_status << ","
-                                                  << entry.p_exclusion_name << ","
-                                                  << entry.p_building_unit << ","
-                                                  << entry.p_unit_type << ","
-                                                  << entry.p_floorplan << ","
-                                                  << entry.p_sqft << ","
-                                                  << entry.p_market_rent << ","
-                                                  << entry.p_prior_lease_rent << ",";
+                                                                       << entry.p_status << ","
+                                                                       << entry.p_exclusion_name << ","
+                                                                       << entry.p_building_unit << ","
+                                                                       << entry.p_unit_type << ","
+                                                                       << entry.p_floorplan << ","
+                                                                       << entry.p_sqft << ","
+                                                                       << entry.p_market_rent << ","
+                                                                       << entry.p_prior_lease_rent << ",";
             dateAsStr = tmtostr(entry.p_move_out);
             if ( dateAsStr == "1900/01/00" )
                 outFS << ",";
@@ -279,7 +284,30 @@ void writeAvailabilityReport(std::vector<Property>& properties)
             else 
                 outFS << dateAsStr << ",";
 
-            outFS << entry.p_best_price << ","
+            dateAsStr = tmtostr(entry.p_scheduled_move_in);
+            if ( dateAsStr == "1900/01/00" )
+                outFS << ",";
+            else
+                outFS << dateAsStr << ",";
+
+            if ( dateAsStr == "1900/01/00" )
+                outFS << ",";
+            else
+            {
+                int daysUntilMoveIn = daysBetweenDates(entry.p_scheduled_move_in);
+                if ( daysUntilMoveIn < 0 )
+                    outFS << daysUntilMoveIn << ",";
+                else
+                    outFS << daysUntilMoveIn + 1 << ",";
+            }
+
+            if ( entry.p_turn_time_mo_avail_str.size() )
+                outFS << entry.p_turn_time_mo_avail << ",";
+            else
+                outFS << entry.p_turn_time_mo_avail_str << ",";
+
+            outFS << -daysBetweenDates(entry.p_available_on) << ","
+                  << entry.p_best_price << ","
                   << entry.p_budgeted_rent << ",";
 
             if ( entry.p_future_lease_rent_str.size() )
@@ -299,6 +327,7 @@ void writeAvailabilityReport(std::vector<Property>& properties)
 
     outFS.close();
 }
+*/
 
 void writeResidentRetentionReport(std::vector<Property>& properties)
 {
