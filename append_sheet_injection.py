@@ -117,11 +117,24 @@ for csv_file in csv_files:
     start_cell = f'A{next_empty_row}'
     end_cell = f'{end_col}{next_empty_row + len(data) - 1}'
 
-    # Update the worksheet in one batch starting at the next empty row
-    try:
-        safe_sheet_update(worksheet, range_name=f'{start_cell}:{end_cell}', data=data)
-        log_message(f"✅ Data from '{csv_file}' appended to sheet '{sheet_name}' successfully.")
-    except Exception as e:
-        log_message(f"❌ Error appending data from '{csv_file}': {e}")
+    # Update the worksheet in smaller chunks starting at the next empty row
+    chunk_size = 500  # Define the chunk size for splitting data
+    for i in range(0, len(data), chunk_size):
+        chunk = data[i:i + chunk_size]  # Slice the data into chunks
+        start_chunk_row = next_empty_row + i  # Calculate the starting row for this chunk
+        end_chunk_row = start_chunk_row + len(chunk) - 1  # Calculate the ending row
+        end_chunk_col = chr(64 + max(len(row) for row in chunk))  # Determine the end column
+
+        # Define the range for this chunk
+        start_cell = f'A{start_chunk_row}'
+        end_cell = f'{end_chunk_col}{end_chunk_row}'
+        
+        try:
+            safe_sheet_update(worksheet, range_name=f'{start_cell}:{end_cell}', data=chunk)
+            log_message(f"✅ Chunk {i // chunk_size + 1}: Rows {start_chunk_row} to {end_chunk_row} successfully appended to '{sheet_name}'.")
+        except Exception as e:
+            log_message(f"❌ Error appending chunk {i // chunk_size + 1}: Rows {start_chunk_row} to {end_chunk_row} in '{sheet_name}': {e}")
+            raise
+
 
 log_message("All CSV files have been processed.")

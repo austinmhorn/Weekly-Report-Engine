@@ -82,7 +82,5 @@ int main(int argc, const char **argv)
     injectData(properties);
     writeData(properties);
 
-    simpleCopyAvailabilityReport(sExportDate);
-
     return 0;
 }

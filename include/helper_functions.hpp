@@ -189,9 +189,11 @@ std::string transformDatePeriodStr(const std::string& input) {
         return "Invalid month format";
     }
 
-    // Format the output as "M/YYYY"
+    // Format the output as "YYYY/MM/DD" with leading zeros
     std::ostringstream oss;
-    oss << monthMap[monthStr] << "/" << (year);  // Assumes "24" means "2024"
+    oss << year << "/"
+        << std::setw(2) << std::setfill('0') << monthMap[monthStr] << "/"
+        << "01"; // Always pad day as "01"
     
     return oss.str();
 }

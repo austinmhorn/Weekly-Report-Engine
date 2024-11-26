@@ -68,6 +68,29 @@ if __name__ == "__main__":
         else:
             log_message(f"❌ Weekly-Report-Engine failed with return code {process.returncode}.")
 
+        # Step 3.5: Fix CSV format
+        log_message("Fixing CSV format...")
+        try:
+            # Use provided_date in file paths
+            input_file = f"data/{provided_date}/clean/Availability.csv"  # Adjust as needed
+            output_file = f"data/{provided_date}/bin/Availability Report.csv"  # Adjust as needed
+            
+            # Construct and execute the command
+            command = ["python3", "fix_csv_format.py", input_file, output_file]
+            log_message(f"Executing: {' '.join(command)}")
+            
+            with open(log_file_path, "a") as log_file:
+                process = subprocess.Popen(command, stdout=log_file, stderr=log_file)
+                process.wait()
+            
+            # Log the result
+            if process.returncode == 0:
+                log_message("✅ fix_csv_format.py completed successfully.")
+            else:
+                log_message(f"❌ fix_csv_format.py failed with return code {process.returncode}.")
+        except Exception as e:
+            log_message(f"❌ An error occurred during Step 3.5: {e}")
+
         # Step 4: Append data to Google Sheets
         execute_script("append_sheet_injection.py", provided_date, "--log", log_file_path)
 

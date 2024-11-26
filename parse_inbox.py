@@ -58,7 +58,7 @@ def authenticate_gmail():
                 creds = None  # Force re-authentication
         if not creds:
             flow = InstalledAppFlow.from_client_secrets_file('oauth2-credentials.json', SCOPES)
-            creds = flow.run_local_server(port=8080)
+            creds = flow.run_local_server(port=8080, open_browser=False)  # Add open_browser=False here
         with open('token.json', 'w') as token_file:
             token_file.write(creds.to_json())
     return build('gmail', 'v1', credentials=creds)

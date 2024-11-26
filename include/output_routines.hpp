@@ -147,17 +147,8 @@ void writeOverviewReport(std::vector<Property>& properties)
 
             nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << "Sum of Total Charges," << totalRentCharges << "," << ORIGIN_RENT_RECEIPTS << "," << "03. Total Rent Charges," << SECTION_COLLECTIONS << std::endl;
             nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << "Sum of Total Collections," << totalRentCollected << "," << ORIGIN_RENT_RECEIPTS << "," << "04. Total Rent Collected," << SECTION_COLLECTIONS << std::endl;
-            
-            float sumPercentCollected = 0;
-            int entryCount = 0;
 
-            for (auto &entry: prop.receipts)
-            {
-                sumPercentCollected += entry.p_percent_collected;
-                entryCount++;
-            }
-
-            float totalPercentCollected = sumPercentCollected / entryCount;
+            float totalPercentCollected = totalRentCollected / totalRentCharges;
 
             nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << "% Collected," << totalPercentCollected << "," << ORIGIN_RENT_RECEIPTS << "," << "05. % Collected," << SECTION_COLLECTIONS << std::endl;
 
