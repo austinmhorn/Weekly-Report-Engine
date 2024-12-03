@@ -9,21 +9,21 @@ def fix_csv_file(input_file, output_file):
     current_row = []
 
     for line in lines:
-        # If the line has the correct number of commas for the expected columns
-        if line.count(',') >= 21:
+        # Check if the line matches the structure of a valid row
+        if line.count(',') >= 21 and not line.strip().startswith("Future Lease Rent"):
             # Save the current row if it exists
             if current_row:
-                fixed_lines.append(''.join(current_row))
+                fixed_lines.append(''.join(current_row).strip() + '\n')  # Join and add newline
                 current_row = []
-            # Add the current valid line
-            fixed_lines.append(line)
+            # Add the valid line as a new row
+            fixed_lines.append(line.strip() + '\n')
         else:
-            # Otherwise, continue the previous row
+            # Handle cases where "Future Lease Rent" is a new line or partial data continues
             current_row.append(line.strip() + ' ')
 
     # Add the last row if necessary
     if current_row:
-        fixed_lines.append(''.join(current_row))
+        fixed_lines.append(''.join(current_row).strip() + '\n')
 
     # Write the fixed lines to the output file
     with open(output_file, 'w', newline='') as outfile:
