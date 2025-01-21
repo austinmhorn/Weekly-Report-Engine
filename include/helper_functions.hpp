@@ -198,6 +198,35 @@ std::string transformDatePeriodStr(const std::string& input) {
     return oss.str();
 }
 
+std::string transformToMonthAndYear(const std::string& input) {
+    // Map of month abbreviations to numbers
+    std::unordered_map<std::string, int> monthMap = {
+        {"Jan", 1}, {"Feb", 2}, {"Mar", 3}, {"Apr", 4},
+        {"May", 5}, {"Jun", 6}, {"Jul", 7}, {"Aug", 8},
+        {"Sep", 9}, {"Oct", 10}, {"Nov", 11}, {"Dec", 12}
+    };
+
+    std::istringstream iss(input);
+    std::string monthStr;
+    int year;
+
+    // Parse the month and year from the input string
+    iss >> monthStr >> year;
+
+    // Check if the month string is valid
+    if (monthMap.find(monthStr) == monthMap.end()) {
+        return "Invalid month format";
+    }
+
+    // Format the output as "MM/YYYY" with leading zeros
+    std::ostringstream oss;
+    oss << std::setw(2) << std::setfill('0') << monthMap[monthStr] << "/"
+        << year;
+
+    return oss.str();
+}
+
+
 void replaceDotsWithSlashes(std::string& str) {
     for (char& ch : str) {
         if (ch == '.') {
