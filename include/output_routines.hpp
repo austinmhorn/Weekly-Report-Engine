@@ -350,7 +350,7 @@ void writeResidentRetentionReport(std::vector<Property>& properties)
         for (auto &entry: prop.retention) {
             outFS << overviewReportNameMap.at(static_cast<OverviewReportDictionary>(prop.p_dict_key)) << ","
                   << sExportDate_Forward_Slash_Format << ","
-                  << transformDatePeriodStr(entry.p_month) << ","
+                  << transformToMonthAndYear(entry.p_month) << ","
                   << entry.p_expiring_leases << ","
                   << entry.p_early_move_out << ","
                   << static_cast<float>(entry.p_early_move_out) / static_cast<float>(entry.p_expiring_leases) << ","
@@ -388,18 +388,18 @@ void writeIncomeStatementReport(std::vector<Property>& properties)
         const char* name = overviewReportNameMap.at(static_cast<OverviewReportDictionary>(prop.p_dict_key));
         // Ignore "Company" Property struct created from Birchstone Dashboard Report
         if (prop.p_dict_key != static_cast<unsigned>(DashboardReportDictionary::Company)) {
-            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformDatePeriodStr(prop.income.p_balance_11_months_ago.first) << "," << prop.income.p_balance_11_months_ago.second << std::endl;
-            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformDatePeriodStr(prop.income.p_balance_10_months_ago.first) << "," << prop.income.p_balance_10_months_ago.second << std::endl;
-            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformDatePeriodStr(prop.income.p_balance_9_months_ago.first) << "," << prop.income.p_balance_9_months_ago.second << std::endl;
-            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformDatePeriodStr(prop.income.p_balance_8_months_ago.first) << "," << prop.income.p_balance_8_months_ago.second << std::endl;
-            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformDatePeriodStr(prop.income.p_balance_7_months_ago.first) << "," << prop.income.p_balance_7_months_ago.second << std::endl;
-            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformDatePeriodStr(prop.income.p_balance_6_months_ago.first) << "," << prop.income.p_balance_6_months_ago.second << std::endl;
-            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformDatePeriodStr(prop.income.p_balance_5_months_ago.first) << "," << prop.income.p_balance_5_months_ago.second << std::endl;
-            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformDatePeriodStr(prop.income.p_balance_4_months_ago.first) << "," << prop.income.p_balance_4_months_ago.second << std::endl;
-            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformDatePeriodStr(prop.income.p_balance_3_months_ago.first) << "," << prop.income.p_balance_3_months_ago.second << std::endl;
-            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformDatePeriodStr(prop.income.p_balance_2_months_ago.first) << "," << prop.income.p_balance_2_months_ago.second << std::endl;
-            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformDatePeriodStr(prop.income.p_balance_1_months_ago.first) << "," << prop.income.p_balance_1_months_ago.second << std::endl;
-            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformDatePeriodStr(prop.income.p_balance_0_months_ago.first) << "," << prop.income.p_balance_0_months_ago.second << std::endl;
+            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformToMonthAndYear(prop.income.p_balance_11_months_ago.first) << "," << prop.income.p_balance_11_months_ago.second << std::endl;
+            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformToMonthAndYear(prop.income.p_balance_10_months_ago.first) << "," << prop.income.p_balance_10_months_ago.second << std::endl;
+            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformToMonthAndYear(prop.income.p_balance_9_months_ago.first) << "," << prop.income.p_balance_9_months_ago.second << std::endl;
+            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformToMonthAndYear(prop.income.p_balance_8_months_ago.first) << "," << prop.income.p_balance_8_months_ago.second << std::endl;
+            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformToMonthAndYear(prop.income.p_balance_7_months_ago.first) << "," << prop.income.p_balance_7_months_ago.second << std::endl;
+            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformToMonthAndYear(prop.income.p_balance_6_months_ago.first) << "," << prop.income.p_balance_6_months_ago.second << std::endl;
+            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformToMonthAndYear(prop.income.p_balance_5_months_ago.first) << "," << prop.income.p_balance_5_months_ago.second << std::endl;
+            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformToMonthAndYear(prop.income.p_balance_4_months_ago.first) << "," << prop.income.p_balance_4_months_ago.second << std::endl;
+            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformToMonthAndYear(prop.income.p_balance_3_months_ago.first) << "," << prop.income.p_balance_3_months_ago.second << std::endl;
+            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformToMonthAndYear(prop.income.p_balance_2_months_ago.first) << "," << prop.income.p_balance_2_months_ago.second << std::endl;
+            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformToMonthAndYear(prop.income.p_balance_1_months_ago.first) << "," << prop.income.p_balance_1_months_ago.second << std::endl;
+            nameAndDate(outFS, name, sExportDate_Forward_Slash_Format) << transformToMonthAndYear(prop.income.p_balance_0_months_ago.first) << "," << prop.income.p_balance_0_months_ago.second << std::endl;
         }
     }
 
